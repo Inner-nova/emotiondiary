@@ -243,6 +243,12 @@
       gap:14px;
     }
 
+    /* ✅ 모바일에서만: 그래프가 위 / 글목록이 아래 */
+    @media (max-width: 980px){
+      #chartCard{ order: 1; }
+      #listCard{ order: 2; }
+    }
+
     /* Mood form */
     .moodBox{
       margin-top:12px;
@@ -467,7 +473,7 @@
           <div class="moodBox">
             <div class="moodTitleRow">
               <b>감정 체크</b>
-              <span class="fineprint">추가 시 오른쪽 그래프에 반영됩니다.</span>
+              <span class="fineprint">추가 시 그래프에 반영됩니다.</span>
             </div>
 
             <div class="moodGrid">
@@ -518,23 +524,8 @@
 
       <!-- Right side -->
       <aside class="side">
-        <!-- 글 목록 -->
-        <section class="card">
-          <div class="cardHead">
-            <b>목록</b>
-            <span id="count">0개</span>
-          </div>
-          <div class="cardBody">
-            <div class="list" id="list"></div>
-            <div class="empty" id="empty" style="display:none;">
-              아직 저장된 글이 없습니다.<br/>
-              오른쪽 위 “새 글”을 눌러 시작하실 수 있습니다.
-            </div>
-          </div>
-        </section>
-
-        <!-- 감정 그래프 -->
-        <section class="card">
+        <!-- ✅ 감정 그래프 (모바일에서 위로 오게) -->
+        <section class="card" id="chartCard">
           <div class="cardHead">
             <b>감정 그래프</b>
             <span id="checkCount">0개</span>
@@ -550,7 +541,22 @@
 
             <div class="list" id="checkList" style="margin-top:10px;"></div>
             <div class="empty" id="checkEmpty" style="display:none;">
-                          </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ✅ 글 목록 (모바일에서 가장 아래로) -->
+        <section class="card" id="listCard">
+          <div class="cardHead">
+            <b>목록</b>
+            <span id="count">0개</span>
+          </div>
+          <div class="cardBody">
+            <div class="list" id="list"></div>
+            <div class="empty" id="empty" style="display:none;">
+              아직 저장된 글이 없습니다.<br/>
+              오른쪽 위 “새 글”을 눌러 시작하실 수 있습니다.
+            </div>
           </div>
         </section>
       </aside>
