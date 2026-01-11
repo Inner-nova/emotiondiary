@@ -1,0 +1,1181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>감정 일기</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2107@1.1/MaruBuri.css">
+
+  <style>
+    :root{
+      --bg: #F3EFEA;
+      --card: #FAF7F2;
+      --text: #3E3A36;
+      --muted: #7A746E;
+      --line: #E3DDD5;
+      --shadow: 0 14px 34px rgba(0,0,0,.08);
+      --radius: 18px;
+      --danger: #B24A4A;
+      --dangerBg: rgba(178,74,74,.08);
+      --focus: rgba(122,116,110,.22);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      background: radial-gradient(1200px 700px at 25% 10%, #fff, var(--bg));
+      color: var(--text);
+      font-family: Pretendard, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, "Apple SD Gothic Neo";
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 22px 16px 24px;
+    }
+
+    header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .headText{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .headline{
+      font-size:16px;
+      letter-spacing:-.2px;
+      line-height:1.3;
+    }
+
+    .subline{
+      font-size:12.5px;
+      color: var(--muted);
+      line-height:1.45;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.55);
+      font-size:12px;
+      color: var(--muted);
+      user-select:none;
+      white-space:nowrap;
+    }
+
+    .btn{
+      padding:9px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.65);
+      font-size:12.5px;
+      color: var(--text);
+      cursor:pointer;
+      transition: .12s transform, .12s background, .12s border;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.8);
+      border-color: #d6cec4;
+    }
+    .btn:active{ transform: translateY(0); }
+
+    .btn.danger{
+      border-color: rgba(178,74,74,.35);
+      color: var(--danger);
+      background: rgba(255,255,255,.65);
+    }
+    .btn.danger:hover{
+      background: var(--dangerBg);
+      border-color: rgba(178,74,74,.5);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.4fr .8fr;
+      gap: 14px;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .cardHead{
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .cardHead b{
+      font-size:13px;
+      letter-spacing:-.2px;
+    }
+    .cardHead span{
+      font-size:12px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+
+    .cardBody{ padding: 14px; }
+
+    textarea{
+      width:100%;
+      min-height: 50vh;
+      resize: vertical;
+      padding: 18px 18px 20px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      outline: none;
+      background: rgba(255,255,255,.55);
+      color: var(--text);
+      font-family: "MaruBuri", "Nanum Myeongjo", serif;
+      font-size: 16px;
+      line-height: 1.9;
+      letter-spacing: -0.01em;
+    }
+    textarea::placeholder{ color: rgba(122,116,110,.75); }
+    textarea:focus{
+      box-shadow: 0 0 0 4px var(--focus);
+      border-color: #d6cec4;
+      background: rgba(255,255,255,.75);
+    }
+
+    .editorFooter{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-top:12px;
+      padding: 0 2px;
+      flex-wrap:wrap;
+    }
+    .fineprint{
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.45;
+    }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .item{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.55);
+      cursor:pointer;
+      transition: .12s transform, .12s background, .12s border;
+    }
+    .item:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.8);
+      border-color: #d6cec4;
+    }
+    .item.active{
+      border-color: rgba(122,116,110,.55);
+      box-shadow: 0 0 0 3px rgba(122,116,110,.10);
+    }
+    .itemTop{
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .itemTop b{
+      font-size:12.5px;
+      opacity:.95;
+    }
+    .itemTop span{
+      font-size:11.5px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .preview{
+      margin-top:6px;
+      font-size:12.5px;
+      color: rgba(62,58,54,.88);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:overflow;
+      text-overflow:ellipsis;
+    }
+    .empty{
+      font-size:13px;
+      color: var(--muted);
+      line-height:1.55;
+      padding: 8px 2px;
+    }
+
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    /* Mood form */
+    .moodBox{
+      margin-top:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.45);
+      border-radius: 16px;
+      padding: 12px;
+    }
+    .moodTitleRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .moodTitleRow b{
+      font-size:12.5px;
+      letter-spacing:-.2px;
+    }
+    .moodGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .moodGrid{ grid-template-columns: 1fr; }
+    }
+
+    .field label{
+      display:block;
+      font-size:11.5px;
+      color: var(--muted);
+      margin: 2px 0 6px;
+    }
+    select, input[type="text"]{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      outline:none;
+      background: rgba(255,255,255,.65);
+      color: var(--text);
+      font-size: 13px;
+    }
+    select:focus, input[type="text"]:focus{
+      box-shadow: 0 0 0 4px var(--focus);
+      border-color: #d6cec4;
+      background: rgba(255,255,255,.78);
+    }
+    .rangeRow{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    input[type="range"]{
+      width:100%;
+      accent-color: #8b847d;
+    }
+    .scorePill{
+      padding:6px 9px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.55);
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+      min-width: 46px;
+      text-align:center;
+    }
+    .moodActions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    /* Check list items */
+    .checkinItem{
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.55);
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .checkinTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .checkinTop b{
+      font-size:12.5px;
+    }
+    .checkinTop span{
+      font-size:11.5px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .checkinMeta{
+      font-size:12.5px;
+      color: rgba(62,58,54,.9);
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 10px;
+      align-items:center;
+    }
+    .tag{
+      font-size:11.5px;
+      color: var(--muted);
+      border:1px solid var(--line);
+      padding:4px 8px;
+      border-radius:999px;
+      background: rgba(255,255,255,.55);
+    }
+    .miniBtn{
+      border: 1px solid rgba(178,74,74,.35);
+      color: var(--danger);
+      background: rgba(255,255,255,.65);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor:pointer;
+    }
+    .miniBtn:hover{
+      background: var(--dangerBg);
+      border-color: rgba(178,74,74,.5);
+    }
+
+    /* Chart area */
+    .chartWrap{
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 10px 6px;
+      background: rgba(255,255,255,.50);
+      height: 220px;
+    }
+
+    /* Modal */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index: 50;
+    }
+    .modal{
+      width: min(520px, 100%);
+      background: #fff;
+      border:1px solid #e6dfd7;
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .modal h3{
+      margin:0;
+      padding:14px 14px 10px;
+      border-bottom:1px solid #eee7e0;
+      font-size:14px;
+      letter-spacing:-.2px;
+      color: var(--text);
+    }
+    .modal .content{
+      padding:12px 14px 4px;
+      color: var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+    .modal .actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      padding:12px 14px 14px;
+    }
+
+    footer{
+      max-width: 1100px;
+      margin: 14px auto 0;
+      padding: 0 16px 18px;
+      color: rgba(122,116,110,.75);
+      font-size: 11px;
+      line-height: 1.5;
+      text-align: left;
+    }
+    footer a{
+      color: rgba(122,116,110,.75);
+      text-decoration: none;
+    }
+    footer a:hover{ text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="headText">
+        <div class="headline">오늘의 마음을 기록해 보세요</div>
+        <div class="subline">작성한 내용은 이 기기 안의 브라우저에만 저장됩니다.</div>
+      </div>
+
+      <div class="actions">
+        <div id="savePill" class="pill">저장 전</div>
+        <button id="newBtn" class="btn" type="button">새 글</button>
+        <button id="deleteOneBtn" class="btn danger" type="button">이 글 삭제</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Editor -->
+      <section class="card">
+        <div class="cardHead">
+          <div><b id="editorTitle">새 글</b></div>
+          <span id="editorMeta"> </span>
+        </div>
+        <div class="cardBody">
+          <textarea id="editor" placeholder=" " aria-label="메모"></textarea>
+
+          <!-- 감정 체크 입력 -->
+          <div class="moodBox">
+            <div class="moodTitleRow">
+              <b>감정 체크</b>
+              <span class="fineprint">추가 시 오른쪽 그래프에 반영됩니다.</span>
+            </div>
+
+            <div class="moodGrid">
+              <div class="field">
+                <label for="emotionSelect">감정</label>
+                <select id="emotionSelect">
+                  <option value="평온">평온</option>
+                  <option value="기쁨">기쁨</option>
+                  <option value="감사">감사</option>
+                  <option value="기대">기대</option>
+                  <option value="불안">불안</option>
+                  <option value="슬픔">슬픔</option>
+                  <option value="분노">분노</option>
+                  <option value="무기력">무기력</option>
+                  <option value="스트레스">스트레스</option>
+                  <option value="기타">기타</option>
+                </select>
+              </div>
+
+              <!-- ✅ 여기(감정 필드 옆)에 '기타' 선택 시 입력창이 "생성/제거"됩니다 -->
+              <div id="customEmotionSlot"></div>
+
+              <div class="field" style="grid-column: 1 / -1;">
+                <label>강도 (부정 ↔ 긍정, -10 ~ +10)</label>
+                <div class="rangeRow">
+                  <input id="intensity" type="range" min="-10" max="10" step="1" value="0" />
+                  <div class="scorePill" id="scoreLabel">0</div>
+                </div>
+              </div>
+
+              <div class="field" style="grid-column: 1 / -1;">
+                <label for="triggerInput">계기 / 어떤 일이 있었나요?</label>
+                <input id="triggerInput" type="text" placeholder="예: 아침에 연락이 와서 / 회의에서 한마디 들음 / 맛있는 음식을 먹음 등등" />
+              </div>
+            </div>
+
+            <div class="moodActions">
+              <button id="addCheckBtn" class="btn" type="button">체크 추가</button>
+            </div>
+          </div>
+
+          <div class="editorFooter">
+            <div class="fineprint" id="lastSaved"> </div>
+            <div class="fineprint" id="chars">0자</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right side -->
+      <aside class="side">
+        <!-- 글 목록 -->
+        <section class="card">
+          <div class="cardHead">
+            <b>목록</b>
+            <span id="count">0개</span>
+          </div>
+          <div class="cardBody">
+            <div class="list" id="list"></div>
+            <div class="empty" id="empty" style="display:none;">
+              아직 저장된 글이 없습니다.<br/>
+              오른쪽 위 “새 글”을 눌러 시작하실 수 있습니다.
+            </div>
+          </div>
+        </section>
+
+        <!-- 감정 그래프 -->
+        <section class="card">
+          <div class="cardHead">
+            <b>감정 그래프</b>
+            <span id="checkCount">0개</span>
+          </div>
+          <div class="cardBody">
+            <div class="chartWrap">
+              <canvas id="moodChart" aria-label="감정 그래프"></canvas>
+            </div>
+
+            <div class="editorFooter" style="margin-top:10px;">
+              <div class="fineprint">체크 목록</div>
+            </div>
+
+            <div class="list" id="checkList" style="margin-top:10px;"></div>
+            <div class="empty" id="checkEmpty" style="display:none;">
+                          </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <footer>
+    제작자: Nova<br/>
+    블로그: <a href="https://blog.naver.com/nova_re" target="_blank" rel="noopener noreferrer">https://blog.naver.com/nova_re</a>
+  </footer>
+
+  <!-- Modal -->
+  <div id="modalBack" class="modalBack" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3 id="modalTitle">확인</h3>
+      <div class="content" id="modalContent"></div>
+      <div class="actions">
+        <button id="modalCancel" class="btn" type="button">취소</button>
+        <button id="modalOk" class="btn danger" type="button">삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    const STORAGE_KEY = "warm_beige_entries_v8";
+    const ACTIVE_KEY  = "warm_beige_active_id_v8";
+
+    const editor = document.getElementById("editor");
+    const savePill = document.getElementById("savePill");
+    const lastSaved = document.getElementById("lastSaved");
+    const chars = document.getElementById("chars");
+
+    const listEl = document.getElementById("list");
+    const emptyEl = document.getElementById("empty");
+    const countEl = document.getElementById("count");
+
+    const editorTitle = document.getElementById("editorTitle");
+    const editorMeta = document.getElementById("editorMeta");
+
+    const newBtn = document.getElementById("newBtn");
+    const deleteOneBtn = document.getElementById("deleteOneBtn");
+
+    const modalBack = document.getElementById("modalBack");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalContent = document.getElementById("modalContent");
+    const modalCancel = document.getElementById("modalCancel");
+    const modalOk = document.getElementById("modalOk");
+
+    // Mood UI
+    const emotionSelect = document.getElementById("emotionSelect");
+    const customEmotionSlot = document.getElementById("customEmotionSlot");
+    const intensity = document.getElementById("intensity");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const triggerInput = document.getElementById("triggerInput");
+    const addCheckBtn = document.getElementById("addCheckBtn");
+
+    const checkCount = document.getElementById("checkCount");
+    const moodChartCanvas = document.getElementById("moodChart");
+    const checkList = document.getElementById("checkList");
+    const checkEmpty = document.getElementById("checkEmpty");
+
+    /** @typedef {{id:string, ts:number, emotion:string, score:number, trigger:string}} Check */
+    /** @typedef {{id:string, createdAt:number, updatedAt:number, text:string, checks:Check[]}} Entry */
+
+    let entries = loadEntries();
+    let activeId = localStorage.getItem(ACTIVE_KEY) || null;
+
+    let saveTimer = null;
+    let lastSavedText = "";
+    let moodChart = null;
+
+    // ✅ 기타 직접입력 요소는 필요할 때만 생성합니다.
+    let emotionCustomEl = null;
+
+    function uid(){
+      return "e_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2,10);
+    }
+
+    function fmt(ts){
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth()+1).padStart(2,"0");
+      const day = String(d.getDate()).padStart(2,"0");
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${y}.${m}.${day} ${hh}:${mm}`;
+    }
+
+    function fmtTime(ts){
+      const d = new Date(ts);
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      return `${hh}:${mm}`;
+    }
+
+    function preview(text){
+      const s = (text || "").replace(/\s+/g, " ").trim();
+      return s.length ? s : "—";
+    }
+
+    function migrateEntry(e){
+      if(!e || typeof e !== "object") return null;
+      if(Array.isArray(e.checkins) && !Array.isArray(e.checks)){
+        e.checks = e.checkins;
+        delete e.checkins;
+      }
+      if(!Array.isArray(e.checks)) e.checks = [];
+      if(typeof e.text !== "string") e.text = "";
+      if(typeof e.createdAt !== "number") e.createdAt = Date.now();
+      if(typeof e.updatedAt !== "number") e.updatedAt = e.createdAt;
+      if(typeof e.id !== "string") e.id = uid();
+      return e;
+    }
+
+    function loadEntries(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        const parsed = JSON.parse(raw);
+        if(!Array.isArray(parsed)) return [];
+        return parsed.map(migrateEntry).filter(Boolean);
+      }catch{
+        return [];
+      }
+    }
+
+    function persist(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function sortEntries(){
+      entries.sort((a,b)=> b.updatedAt - a.updatedAt);
+    }
+
+    function getActive(){
+      return entries.find(e => e.id === activeId) || null;
+    }
+
+    function setActive(id){
+      activeId = id;
+      if(id) localStorage.setItem(ACTIVE_KEY, id);
+      else localStorage.removeItem(ACTIVE_KEY);
+      render();
+      focusEditor();
+    }
+
+    function focusEditor(){
+      setTimeout(()=> editor.focus(), 30);
+    }
+
+    function ensureActive(){
+      sortEntries();
+      if(entries.length === 0){
+        createEntry();
+        return;
+      }
+      if(!getActive()){
+        setActive(entries[0].id);
+      }
+    }
+
+    function setPill(state){
+      if(state === "idle"){
+        savePill.textContent = "저장 전";
+        lastSaved.textContent = " ";
+      } else if(state === "saving"){
+        savePill.textContent = "저장 중…";
+      } else if(state === "saved"){
+        savePill.textContent = "저장됨";
+        lastSaved.textContent = `마지막 저장: ${fmt(Date.now())}`;
+      }
+    }
+
+    function updateCount(){
+      const t = editor.value || "";
+      chars.textContent = `${t.length}자`;
+    }
+
+    function flushSaveNow(){
+      const cur = getActive();
+      if(!cur) return;
+
+      const text = editor.value || "";
+      if(text === lastSavedText) return;
+
+      cur.text = text;
+      cur.updatedAt = Date.now();
+      lastSavedText = text;
+
+      persist();
+      setPill(text.trim().length ? "saved" : "idle");
+      renderList();
+      renderEditorMeta();
+    }
+
+    function triggerAutosave(){
+      if(saveTimer) clearTimeout(saveTimer);
+      setPill("saving");
+      saveTimer = setTimeout(() => {
+        flushSaveNow();
+        saveTimer = null;
+      }, 800);
+    }
+
+    function createEntry(){
+      const now = Date.now();
+      const e = { id: uid(), createdAt: now, updatedAt: now, text: "", checks: [] };
+      entries.unshift(e);
+      persist();
+      setActive(e.id);
+      setPill("idle");
+    }
+
+    function deleteEntry(id){
+      entries = entries.filter(e => e.id !== id);
+      persist();
+      if(entries.length === 0){
+        activeId = null;
+        localStorage.removeItem(ACTIVE_KEY);
+        createEntry();
+      } else {
+        sortEntries();
+        setActive(entries[0].id);
+      }
+    }
+
+    function hideModal(){
+      modalBack.style.display = "none";
+      modalOk.onclick = null;
+      modalCancel.onclick = null;
+      document.onkeydown = null;
+      modalOk.disabled = false;
+      modalCancel.disabled = false;
+    }
+
+    function openModal({title, content, okText="삭제", onOk}){
+      modalTitle.textContent = title;
+      modalContent.textContent = content;
+      modalOk.textContent = okText;
+
+      modalOk.disabled = false;
+      modalCancel.disabled = false;
+
+      modalBack.style.display = "flex";
+
+      modalCancel.onclick = () => hideModal();
+
+      modalOk.onclick = () => {
+        modalOk.disabled = true;
+        modalCancel.disabled = true;
+        hideModal();
+        if (typeof onOk === "function") onOk();
+      };
+
+      document.onkeydown = (e) => {
+        if(e.key === "Escape") hideModal();
+      };
+    }
+
+    function renderEditorMeta(){
+      const cur = getActive();
+      if(!cur){
+        editorTitle.textContent = "새 글";
+        editorMeta.textContent = " ";
+        return;
+      }
+      editorTitle.textContent = "글";
+      editorMeta.textContent = `${fmt(cur.createdAt)}`;
+    }
+
+    function renderEditor(){
+      const cur = getActive();
+      if(!cur){
+        editor.value = "";
+        lastSavedText = "";
+        updateCount();
+        setPill("idle");
+        renderEditorMeta();
+        return;
+      }
+      editor.value = cur.text || "";
+      lastSavedText = editor.value;
+      updateCount();
+      setPill((cur.text || "").trim().length ? "saved" : "idle");
+      lastSaved.textContent = (cur.text || "").trim().length ? `마지막 저장: ${fmt(cur.updatedAt)}` : " ";
+      renderEditorMeta();
+    }
+
+    function renderList(){
+      sortEntries();
+      listEl.innerHTML = "";
+      countEl.textContent = `${entries.length}개`;
+
+      if(entries.length === 0){
+        emptyEl.style.display = "block";
+        return;
+      }
+      emptyEl.style.display = "none";
+
+      for(const e of entries){
+        const div = document.createElement("div");
+        div.className = "item" + (e.id === activeId ? " active" : "");
+
+        const top = document.createElement("div");
+        top.className = "itemTop";
+
+        const b = document.createElement("b");
+        b.textContent = fmt(e.updatedAt);
+
+        const s = document.createElement("span");
+        const len = (e.text || "").trim().length;
+        s.textContent = len ? `${len}자` : "빈 글";
+
+        top.appendChild(b);
+        top.appendChild(s);
+
+        const p = document.createElement("div");
+        p.className = "preview";
+        p.textContent = preview(e.text);
+
+        div.appendChild(top);
+        div.appendChild(p);
+
+        div.onclick = () => {
+          flushSaveNow();
+          setActive(e.id);
+        };
+
+        listEl.appendChild(div);
+      }
+    }
+
+    // ✅ 기타 선택 시: 입력창을 "생성" / 아니면 "삭제"
+    function ensureCustomEmotionInput(){
+      const isOther = (emotionSelect.value || "").trim() === "기타";
+
+      if(isOther && !emotionCustomEl){
+        const field = document.createElement("div");
+        field.className = "field";
+
+        const label = document.createElement("label");
+        label.setAttribute("for", "emotionCustom");
+        label.textContent = "감정 직접 입력";
+
+        const input = document.createElement("input");
+        input.id = "emotionCustom";
+        input.type = "text";
+        input.placeholder = "예: 서운함, 허탈함, 안도감…";
+
+        field.appendChild(label);
+        field.appendChild(input);
+
+        customEmotionSlot.appendChild(field);
+        emotionCustomEl = input;
+
+        // 생성되면 바로 포커스
+        setTimeout(()=> emotionCustomEl?.focus(), 0);
+      }
+
+      if(!isOther && emotionCustomEl){
+        customEmotionSlot.innerHTML = "";
+        emotionCustomEl = null;
+      }
+    }
+
+    function updateScoreLabel(){
+      const v = Number(intensity.value || 0);
+      scoreLabel.textContent = String(v);
+    }
+
+    // ✅ 체크 추가 시: 기타면 입력값을 "그대로" 저장해서 체크목록/툴팁/그래프에 반영
+    function getEmotionLabel(){
+      const label = (emotionSelect.value || "평온").trim();
+      if(label === "기타"){
+        const v = (emotionCustomEl?.value || "").trim();
+        return v.length ? v : "기타";
+      }
+      return label;
+    }
+
+    function addCheck(){
+      const cur = getActive();
+      if(!cur) return;
+
+      const score = Number(intensity.value || 0);
+      const emotion = getEmotionLabel();
+      const trigger = (triggerInput.value || "").trim();
+
+      const c = { id: uid(), ts: Date.now(), emotion, score, trigger };
+
+      cur.checks = Array.isArray(cur.checks) ? cur.checks : [];
+      cur.checks.push(c);
+      cur.updatedAt = Date.now();
+
+      persist();
+      renderMood();
+      renderList();
+      setPill("saved");
+
+      // 입력 초기화
+      triggerInput.value = "";
+      if((emotionSelect.value || "").trim() === "기타" && emotionCustomEl){
+        emotionCustomEl.value = "";
+        emotionCustomEl.focus();
+      } else {
+        focusEditor();
+      }
+    }
+
+    function deleteCheck(checkId){
+      const cur = getActive();
+      if(!cur) return;
+      cur.checks = (cur.checks || []).filter(c => c.id !== checkId);
+      cur.updatedAt = Date.now();
+      persist();
+      renderMood();
+      renderList();
+    }
+
+    function renderCheckList(){
+      const cur = getActive();
+      const arr = (cur?.checks || []).slice().sort((a,b)=> b.ts - a.ts);
+
+      checkCount.textContent = `${arr.length}개`;
+      checkList.innerHTML = "";
+
+      if(arr.length === 0){
+        checkEmpty.style.display = "block";
+        return;
+      }
+      checkEmpty.style.display = "none";
+
+      for(const c of arr){
+        const box = document.createElement("div");
+        box.className = "checkinItem";
+
+        const top = document.createElement("div");
+        top.className = "checkinTop";
+
+        const b = document.createElement("b");
+        b.textContent = fmtTime(c.ts);
+
+        const right = document.createElement("span");
+        right.textContent = `점수 ${c.score}`;
+
+        top.appendChild(b);
+        top.appendChild(right);
+
+        const meta = document.createElement("div");
+        meta.className = "checkinMeta";
+
+        const t1 = document.createElement("span");
+        t1.className = "tag";
+        t1.textContent = c.emotion || "—";
+        meta.appendChild(t1);
+
+        if((c.trigger || "").trim().length){
+          const t2 = document.createElement("span");
+          t2.className = "tag";
+          t2.textContent = `계기: ${c.trigger}`;
+          meta.appendChild(t2);
+        }
+
+        const del = document.createElement("button");
+        del.className = "miniBtn";
+        del.type = "button";
+        del.textContent = "삭제";
+        del.onclick = () => {
+          openModal({
+            title: "체크 삭제",
+            content: "이 체크를 삭제하시겠습니까? (되돌릴 수 없습니다)",
+            okText: "삭제",
+            onOk: () => deleteCheck(c.id)
+          });
+        };
+
+        box.appendChild(top);
+        box.appendChild(meta);
+        box.appendChild(del);
+
+        checkList.appendChild(box);
+      }
+    }
+
+    function ensureChart(){
+      if(moodChart) return;
+
+      const ctx = moodChartCanvas.getContext("2d");
+      const gray = "rgba(62,58,54,.85)";
+      const grayPoint = "rgba(62,58,54,.9)";
+
+      moodChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            label: "감정 점수",
+            data: [],
+            tension: 0.25,
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: false,
+            borderColor: gray,
+            pointBackgroundColor: grayPoint,
+            pointBorderColor: grayPoint
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: { padding: { top: 14, right: 6, bottom: 6, left: 6 } },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => items?.[0]?.label ? `시간 ${items[0].label}` : "",
+                label: (item) => {
+                  const idx = item.dataIndex;
+                  const cur = getActive();
+                  const data = (cur?.checks || []).slice().sort((a,b)=> a.ts - b.ts);
+                  const c = data[idx];
+                  if(!c) return `점수 ${item.formattedValue}`;
+                  const lines = [];
+                  lines.push(`감정: ${c.emotion} / 점수 ${c.score}`);
+                  if((c.trigger || "").trim().length) lines.push(`계기: ${c.trigger}`);
+                  return lines;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              min: -10,
+              max: 10,
+              ticks: {
+                stepSize: 2,
+                autoSkip: false,
+                padding: 8,
+                callback: (v) => v
+              },
+              grid: { color: "rgba(227,221,213,.7)" }
+            },
+            x: {
+              ticks: { autoSkip: true, maxRotation: 0 },
+              grid: { color: "rgba(227,221,213,.45)" }
+            }
+          }
+        }
+      });
+    }
+
+    function renderMoodChart(){
+      ensureChart();
+      const cur = getActive();
+      const data = (cur?.checks || []).slice().sort((a,b)=> a.ts - b.ts);
+      moodChart.data.labels = data.map(c => fmtTime(c.ts));
+      moodChart.data.datasets[0].data = data.map(c => c.score);
+      moodChart.update();
+    }
+
+    function renderMood(){
+      renderCheckList();
+      renderMoodChart();
+    }
+
+    function render(){
+      renderList();
+      renderEditor();
+      ensureCustomEmotionInput();
+      renderMood();
+      updateScoreLabel();
+    }
+
+    // Init
+    ensureActive();
+    render();
+    focusEditor();
+
+    // Events
+    editor.addEventListener("input", () => {
+      updateCount();
+      triggerAutosave();
+    });
+
+    window.addEventListener("beforeunload", () => {
+      flushSaveNow();
+    });
+
+    newBtn.addEventListener("click", () => {
+      flushSaveNow();
+      createEntry();
+    });
+
+    deleteOneBtn.addEventListener("click", () => {
+      const cur = getActive();
+      if(!cur) return;
+      flushSaveNow();
+      openModal({
+        title: "이 글을 삭제하시겠습니까?",
+        content: "삭제하면 되돌릴 수 없습니다.",
+        okText: "삭제",
+        onOk: () => deleteEntry(cur.id)
+      });
+    });
+
+    modalBack.addEventListener("click", (e) => {
+      if(e.target === modalBack){
+        hideModal();
+      }
+    });
+
+    emotionSelect.addEventListener("change", () => {
+      ensureCustomEmotionInput();
+    });
+
+    intensity.addEventListener("input", updateScoreLabel);
+
+    addCheckBtn.addEventListener("click", () => {
+      flushSaveNow();
+      addCheck();
+    });
+  </script>
+</body>
+</html>
